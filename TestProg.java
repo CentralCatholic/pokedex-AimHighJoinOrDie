@@ -1,28 +1,6 @@
-/**
- * @author Sean Hazlett 
- * @version 1.3
- * 
- * Last Update: 4.28.18
- * 
- * Pokedex GUI
- */
-
 import java.io.File;
 import javax.imageio.ImageIO;
-
-public class Main {
-    public static void main (String [] args) {
-        PokedexGUI run = new PokedexGUI (); 
-        run.setSize(500,700); 
-        run.setLocationRelativeTo(null);
-        run.setVisible(true); 
-        
-        run.welcomeScreen(); 
-    }
-}
-
-/*
-public class Main {
+public class TestProg {
     public static void main(String[] args) throws Exception {
         PokeEntry gloom = new PokeEntry("gloom");
         System.out.printf("Name: %s\n", gloom.getName());
@@ -45,4 +23,3 @@ public class Main {
         ImageIO.write(gloom.getImage(), "png", gloomFile);
     }
 }
-*/
