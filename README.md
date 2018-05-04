@@ -70,7 +70,7 @@ Feel free to encode additional information into your Pokedex. For example:
 
 - type matchups
 - store a list of Pokemon the user has seen before, and allow them to quickly link to those Pokemon, perhaps in a different tab. Entering all of the Pokemon and thus completing the list is canonically known as "completing your Pokedéx". Fun fact: I completed my Sapphire Pokédex. Get at me.
-- absolutely anything else you can think of: gym badges, trainer numbers; anything is fair game. Consider the in-game equiment for inspiration (*e.g.* [Pokégear from Johto](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9gear), Pokénav from Hoenn]https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9Nav, [Pokétck from Sinnoh](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9tch))
+- absolutely anything else you can think of: gym badges, trainer numbers; anything is fair game. Consider the in-game equiment for inspiration (*e.g.* [Pokégear from Johto](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9gear), [Pokénav from Hoenn](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9Nav), [Pokétck from Sinnoh](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9tch))
 
 You won't be penalized for not encoding additional information, but you cannot receive extra credit for only implementing the basic features.
 
