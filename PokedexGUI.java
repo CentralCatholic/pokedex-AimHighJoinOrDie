@@ -256,7 +256,7 @@ public class PokedexGUI extends JFrame {
         infoAndTypes.add(infoPanel); 
 
         JPanel typesPanel = new JPanel (); 
-        ArrayList <String> types = (ArrayList)entry.getTypes(); 
+        ArrayList <String> types = (ArrayList <String>)entry.getTypes(); 
         typesPanel.setLayout(new GridLayout(types.size()+1, 1)); 
         JLabel typesHeader = null;
         if (types.size() > 1) 
@@ -285,7 +285,7 @@ public class PokedexGUI extends JFrame {
         // label - diaply text
         currentFlavorText = 0; 
         ArrayList <String> flavorTexts = 
-        	(ArrayList)entry.getFlavorTexts();
+        	(ArrayList <String>)entry.getFlavorTexts();
         JLabel displayFlavorText = 
         	new JLabel ("<html><p>" + flavorTexts.get(0) +
         	"</p></html>"); 
@@ -327,7 +327,7 @@ public class PokedexGUI extends JFrame {
         JMenu priorEvolutions = new JMenu ("Prior Evolutions"); 
         priorEvolutions.setForeground(customRed);
         priorEvolutions.setFont(smallFont);
-        ArrayList <PokeEntry> prior = (ArrayList)entry.priorEvolutions(); 
+        ArrayList <PokeEntry> prior = (ArrayList <PokeEntry>)entry.priorEvolutions(); 
         if (prior != null) {
             for (PokeEntry p : prior) {
                 JMenuItem temp = new JMenuItem (p.getName()); 
@@ -354,7 +354,7 @@ public class PokedexGUI extends JFrame {
         JMenu futureEvolutions = new JMenu ("Future Evolutions"); 
         futureEvolutions.setForeground(customRed);
         futureEvolutions.setFont(smallFont);
-        ArrayList <PokeEntry> future = (ArrayList)entry.evolutions(); 
+        ArrayList <PokeEntry> future = (ArrayList <PokeEntry>)entry.evolutions(); 
         if (future != null) {
             for (PokeEntry p : future) {
                 JMenuItem temp = new JMenuItem (p.getName()); 
@@ -419,8 +419,8 @@ public class PokedexGUI extends JFrame {
         } catch (NumberFormatException nfe) {
             String name = nameOrID.toLowerCase().trim(); 
             try {
-                entry = new PokeEntry (true);
-                // entry = new PokeEntry (name); // Real Code 
+                // entry = new PokeEntry (true);
+                entry = new PokeEntry (name); // Real Code 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Error Creating Entry!");
                 return null; 

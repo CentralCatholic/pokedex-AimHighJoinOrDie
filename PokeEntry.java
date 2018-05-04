@@ -69,7 +69,7 @@ public class PokeEntry {
         
         flavorTexts = new ArrayList <String> (); 
         flavorTexts.add("From its mouth Gloom drips honey that smells absolutely horrible. Apparently, it loves the horrid stench. It sniffs the noxious fumes and then drools even more of its honey."); 
-        flavorTexts.add("Gloom releases a foul fragrance from the pistil of its flower. When faced with danger, the stench worsens. If this Pokémon is feeling calm and secure, it does not release its usual stinky aroma.");
+        flavorTexts.add("Gloom releases a foul fragrance from the pistil of its flower. When faced with danger, the stench worsens. If this Pokemon is feeling calm and secure, it does not release its usual stinky aroma.");
         flavorTexts.add("The honey it drools from its mouth smells so atrocious, it can curl noses more than a mile away."); 
         //evolvesFrom
         //evolvesTo
