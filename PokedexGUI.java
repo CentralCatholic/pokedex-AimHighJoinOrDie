@@ -1,10 +1,17 @@
 /**
  * @author Sean Hazlett
- * @version 1.2
+ * @version 2.1
  * 
- * Last update: 4.28.18
+ * Last update: 5.8.18
+ * 
+ * Graphical Interface that makes use of PokeEntry
+ * 	to create a virtual Pokedex
+ * 
+ * To Run (Windows): 
+ * 	java -classpath '.;javax.json.jar' Main
  */
 
+import java.util.List;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,9 +31,12 @@ import java.io.*;
 import java.util.concurrent.TimeUnit; 
 
 public class PokedexGUI extends JFrame {
+    // instance variables
     private String nameOrID;
     private JPanel panel; 
-
+	
+    //buttons and lables that I change the color of
+    //	throughout the program
     private JLabel welcome; 
     private JButton continueButton;
     private JLabel home;
@@ -34,21 +44,30 @@ public class PokedexGUI extends JFrame {
     private JButton goToLast;
     private JButton goToNext;
     private JButton returnHome; 
-    
+    private PokeEntry entry;
+
+    // position of current favor text
     private int currentFlavorText;
 
+    // thread for color changing
     private Thread colorChangerThread;
 
+    // custom fonts and colors 
     protected static Color customRed = new Color (209, 62, 46);
     protected static Font largeFont = new Font("Serif", Font.BOLD, 60);
     protected static Font mediumFont = new Font("Serif", Font.BOLD, 40);
     protected static Font smallFont = new Font("Serif", Font.BOLD, 25);
     protected static Font microFont = new Font("Serif", Font.BOLD, 15);
-    
+
+    // paths to commonly used images
     protected static URL logoPath = 
-    	PokedexGUI.class.getResource("pokedexLogo.jpg");
+        PokedexGUI.class.getResource("pokedexLogo.jpg");
     protected static URL homePath = 
-    	PokedexGUI.class.getResource("home icon.png");
+        PokedexGUI.class.getResource("home icon.png");
+
+    // progress indicators while loading
+    private boolean loadingSuccessful;
+    private boolean loadingComplete; 
 
     public PokedexGUI () {
         try {
@@ -56,11 +75,13 @@ public class PokedexGUI extends JFrame {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         } catch (Exception e) {
+            // if that doesn't work, blow it up!
             e.printStackTrace();
             System.exit(1);
         }
     }
 
+    //intro screen 
     public void welcomeScreen() {
         panel = new JPanel (); 
         panel.setBackground(customRed); 
@@ -79,6 +100,8 @@ public class PokedexGUI extends JFrame {
 
         continueButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    // interrupt thread when I want to change the 
+                    //	screen 
                     colorChangerThread.interrupt(); 
                     homeScreen(); 
                 }
@@ -98,11 +121,14 @@ public class PokedexGUI extends JFrame {
         colorChangerThread.start();
     }
 
+    // cycle colors on welcome screen 
     private void cycleColorsWelcome () {
         Random rnd = new Random (); 
         while (panel != null) {
             try {
+                // wait a second
                 TimeUnit.SECONDS.sleep(1);
+                // generate new color 
                 Color randomColor = new Color (rnd.nextInt(256), 
                         rnd.nextInt(256), rnd.nextInt(256));
                 welcome.setForeground(randomColor); 
@@ -113,11 +139,12 @@ public class PokedexGUI extends JFrame {
         }
     }
 
+    // home screen 
     public void homeScreen () {
         // remove last panel
-        //Thread.interrupt(); 
         this.remove(panel); 
 
+        // and build a new one
         panel = new JPanel(); 
         panel.setLayout(new GridLayout(3,1)); 
         panel.setBackground(customRed); 
@@ -131,6 +158,7 @@ public class PokedexGUI extends JFrame {
         prompt.setForeground(Color.WHITE);
         prompt.setFont(smallFont); 
         JTextField getNameOrID = new JTextField ();
+        // listen for enter key
         getNameOrID.addActionListener(new ActionListener() {
                 public void actionPerformed (ActionEvent e) {
                     nameOrID = getNameOrID.getText(); 
@@ -158,6 +186,7 @@ public class PokedexGUI extends JFrame {
         homePanel.setLayout(new GridLayout (1,3)); 
         homePanel.setBackground(customRed); 
         JLabel homeLogo = new JLabel(new ImageIcon(homePath));
+        // unfortunately, you can't just add one JLabel twice
         JLabel homeDup = new JLabel(new ImageIcon(homePath));
         home = new JLabel ("Home"); 
         home.setFont(largeFont);
@@ -199,6 +228,7 @@ public class PokedexGUI extends JFrame {
         }
     }
 
+    // a stylizer for buttons 
     private JButton styleButton (JButton b) {
         b.setBackground(Color.BLACK); 
         b.setForeground(Color.WHITE); 
@@ -206,6 +236,8 @@ public class PokedexGUI extends JFrame {
         return b; 
     }
 
+    // search for entry and display it 
+    // returned boolean gives completion status
     public boolean searchScreen () {
         this.remove(panel); 
 
@@ -256,13 +288,14 @@ public class PokedexGUI extends JFrame {
         infoAndTypes.add(infoPanel); 
 
         JPanel typesPanel = new JPanel (); 
-        ArrayList <String> types = (ArrayList <String>)entry.getTypes(); 
+        List <String> types = entry.getTypes(); 
         typesPanel.setLayout(new GridLayout(types.size()+1, 1)); 
         JLabel typesHeader = null;
+        // get that pluralization right! 
         if (types.size() > 1) 
-        	typesHeader = new JLabel ("Types:"); 
+            typesHeader = new JLabel ("Types:"); 
         else if (types.size() == 1)
-        	typesHeader = new JLabel ("Type:");  
+            typesHeader = new JLabel ("Type:");  
         else typesHeader = new JLabel ("No Known Types");  
         typesHeader.setForeground(Color.WHITE);
         typesHeader.setFont(smallFont); 
@@ -282,13 +315,13 @@ public class PokedexGUI extends JFrame {
         JPanel flavorTextsPanel = new JPanel (); 
         flavorTextsPanel.setLayout(new BorderLayout ()); 
         flavorTextsPanel.setBackground(customRed); 
-        // label - diaply text
+        // label - display text in first position
         currentFlavorText = 0; 
-        ArrayList <String> flavorTexts = 
-        	(ArrayList <String>)entry.getFlavorTexts();
+        List <String> flavorTexts = 
+            entry.getFlavorTexts();
         JLabel displayFlavorText = 
-        	new JLabel ("<html><p>" + flavorTexts.get(0) +
-        	"</p></html>"); 
+            new JLabel ("<html><p>" + flavorTexts.get(0) +
+                "</p></html>"); 
         displayFlavorText.setFont(microFont); 
         displayFlavorText.setForeground(Color.WHITE); 
         // button - goto last
@@ -297,9 +330,9 @@ public class PokedexGUI extends JFrame {
         goToLast.addActionListener(new ActionListener() {
                 public void actionPerformed (ActionEvent e) {
                     if (currentFlavorText != 0) 
-                    	displayFlavorText.setText("<html><p>" +
-                    		flavorTexts.get(--currentFlavorText) +
-                    		"</p></html>");
+                        displayFlavorText.setText("<html><p>" +
+                            flavorTexts.get(--currentFlavorText) +
+                            "</p></html>");
                 }
             });
         // button - goto next
@@ -308,9 +341,9 @@ public class PokedexGUI extends JFrame {
         goToNext.addActionListener(new ActionListener() {
                 public void actionPerformed (ActionEvent e) {
                     if (currentFlavorText != flavorTexts.size()-1) 
-                    	displayFlavorText.setText("<html><p>" +
-                    		flavorTexts.get(++currentFlavorText) +
-                    		"</p></html>");
+                        displayFlavorText.setText("<html><p>" +
+                            flavorTexts.get(++currentFlavorText) +
+                            "</p></html>");
                 }
             });
 
@@ -321,14 +354,12 @@ public class PokedexGUI extends JFrame {
 
         JMenuBar evolutionsBar = new JMenuBar (); 
         evolutionsBar.setLayout(new GridLayout (1,2)); 
-        //evolutionsBar.setBackground(customRed); 
-        //evolutionsBar.setOpaque(true); 
 
         JMenu priorEvolutions = new JMenu ("Prior Evolutions"); 
         priorEvolutions.setForeground(customRed);
         priorEvolutions.setFont(smallFont);
-        ArrayList <PokeEntry> prior = (ArrayList <PokeEntry>)entry.priorEvolutions(); 
-        if (prior != null) {
+        List <PokeEntry> prior = entry.priorEvolutions(); 
+        if (prior != null && prior.size() != 0) {
             for (PokeEntry p : prior) {
                 JMenuItem temp = new JMenuItem (p.getName()); 
                 temp.setForeground(customRed);
@@ -343,19 +374,18 @@ public class PokedexGUI extends JFrame {
                 priorEvolutions.add(temp);
             }
         } else {
-            JMenuItem nullPast = new JMenuItem ("No Prior Evolutions"); 
+            JMenuItem nullPast = 
+            	new JMenuItem ("No Prior Evolutions"); 
             nullPast.setForeground(customRed);
             nullPast.setFont(smallFont);
             priorEvolutions.add(nullPast);
         }
-        //priorEvolutions.setBackground(customRed); 
-        //priorEvolutions.setOpaque(true); 
 
         JMenu futureEvolutions = new JMenu ("Future Evolutions"); 
         futureEvolutions.setForeground(customRed);
         futureEvolutions.setFont(smallFont);
-        ArrayList <PokeEntry> future = (ArrayList <PokeEntry>)entry.evolutions(); 
-        if (future != null) {
+        List <PokeEntry> future = entry.evolutions(); 
+        if (future != null && future.size() != 0) {
             for (PokeEntry p : future) {
                 JMenuItem temp = new JMenuItem (p.getName()); 
                 temp.setForeground(customRed);
@@ -367,16 +397,15 @@ public class PokedexGUI extends JFrame {
                             boolean complete = searchScreen(); 
                         }
                     });
-                priorEvolutions.add(temp);
+                futureEvolutions.add(temp);
             }
         } else {
-            JMenuItem nullFuture = new JMenuItem ("No Future Evolutions"); 
+            JMenuItem nullFuture = 
+            	new JMenuItem ("No Future Evolutions"); 
             nullFuture.setForeground(customRed);
             nullFuture.setFont(smallFont);
             futureEvolutions.add(nullFuture);
         }
-        //futureEvolutions.setBackground(customRed);
-        //futureEvolutions.setOpaque(true);
 
         evolutionsBar.add(priorEvolutions); 
         evolutionsBar.add(futureEvolutions);
@@ -390,7 +419,9 @@ public class PokedexGUI extends JFrame {
                     homeScreen(); 
                 }
             });
-        panel.add(returnHome); // must be last added
+            
+       	// must be last added (for my formatting)
+        panel.add(returnHome); 
 
         this.add(panel);
         this.setVisible(true); 
@@ -407,20 +438,29 @@ public class PokedexGUI extends JFrame {
     }
 
     private PokeEntry buildEntry () {
-        PokeEntry entry = null; 
-
+        entry = null; 
         if (nameOrID == null) return null; 
-
+	
+        /*
+         * Overall Strategy:
+         * 1. try to convert to int
+         * 2. if its not an int -> its a string
+         * 3. else throw error
+         */
+        
         try {
             int ID = Integer.parseInt(nameOrID);
             if (ID > 802 || ID < 1) throw new Exception ();
-            entry = new PokeEntry (ID);
+            loadingScreen(ID); 
+            if (!loadingSuccessful) throw new Exception(); 		
             JOptionPane.showMessageDialog(null, "Entry created successfully!");
         } catch (NumberFormatException nfe) {
             String name = nameOrID.toLowerCase().trim(); 
             try {
+                // allows for offline testing
                 // entry = new PokeEntry (true);
-                entry = new PokeEntry (name); // Real Code 
+                loadingScreen(name); 
+                if (!loadingSuccessful) throw new Exception(); 	
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Error Creating Entry!");
                 return null; 
@@ -450,35 +490,72 @@ public class PokedexGUI extends JFrame {
             }
         }
     }
-}
 
-/* 
- * Prompt: 
- * Allow the user to search for a Pokemon by ID or by name, using only one text field.
- * Show an image of that Pokemon in the GUI.
- * Use a Layout other than the default FlowLayout i.e. consider using GridLayout or BorderLayout
- *      , and/or use advanced features of FlowLayout.
- * You must allow the user to see both the prior evolutions (if any) and the future 
- *      evolutions (if any). Additionally, you must allow a user to navigate to those
- *      evolutions with the mouse.
- * You must use more than one color. The default color is not sufficient. See Gaddis, 
- *      748 for more information.
- * You are expected to use either the anonymous type approach to implementing ActionListener
- *      or the Java 8 lambda approach. Only implementing ActionListerners as inner 
- *      classes will cost you a few points.
- * You will be graded not only on the above functionality, but also on the look 
- *      and feel of your program. Better looking programs will receive better grades. 
- *      Programs that are unpleasantly looking, make insufficient use of the API,
- *      or that fail to be ergonomic will lose points. I don't expect everyone
- *      to get an A on this assignment. If you don't care significant care to
- *      make your Pokedex look clean and colorful, display as much information
- *      as possible, and be easy and intuitive to use, you can expect a B or 
- *      lower on this assignment.
- * Your Pokedex is expected to make use of the different flavor texts; given 
- *      that there are usually more than one, at very least you should randomly
- *      select a flavor text to show to the user each time they visit that
- *      Pokemon's entry. Alternatively, you can allow them to cycle through
- *      the different flavor texts. My guess is that you'll find there are 
- *      more flavor texts for Pokemon released earlier, so don't be surprised
- *      if newer Pokemon only have a single flavor text.
- */
+    // The following methods do the same thing, but just have 
+    //	different parameters.  
+    // Is this the best way to implement this? Probably not.
+    // However, producing a frame or JOptionPane in a thread 
+    //	(opposite of shown) and fetching info from the api 
+    //	throws some interesting errors. It does not allow the 
+    // 	frames to be updated or display any information.
+    // After testing with multiple people, I found the loading 
+    //	screen to be necessary - most people believed that the 
+    //	program had died and closed it instead of waiting.  
+    
+    private void loadingScreen (int ID) {
+        loadingComplete = false; 
+        new Thread(new Runnable() {
+                public void run () {
+                    try {
+                        entry = new PokeEntry (ID);
+                        loadingSuccessful = true; 
+                        loadingComplete = true; 
+                    } catch (Exception e){
+                        loadingSuccessful = false; 
+                        loadingComplete = true; 
+                    } finally {
+                        JOptionPane.getRootFrame().dispose();
+                    }
+                }
+            }).start();
+            
+        while (!loadingComplete) {
+            URL loadingPath = 
+                PokedexGUI.class.getResource("nowLoading.gif");
+            ImageIcon loadingAn = new ImageIcon(loadingPath);
+            JOptionPane.showMessageDialog(null, "<html>Please Wait 5 -" +
+                " 10 Seconds:<br>Loading Entry " +
+                "Information</html>", "Loading", 
+                JOptionPane.INFORMATION_MESSAGE,loadingAn);
+        }
+    }
+
+    private void loadingScreen (String name) {
+        loadingComplete = false; 
+        new Thread(new Runnable() {
+                public void run () {
+                    try {
+                        entry = new PokeEntry (name);
+                        loadingSuccessful = true; 
+                        loadingComplete = true; 
+                    } catch (Exception e){
+                        loadingSuccessful = false; 
+                        loadingComplete = true; 
+                    } finally {
+                        JOptionPane.getRootFrame().dispose();
+                    }
+                }
+            }).start();
+
+        while (!loadingComplete) {
+            URL loadingPath = 
+                PokedexGUI.class.getResource("nowLoading.gif");
+            ImageIcon loadingAn = new ImageIcon(loadingPath);
+            JOptionPane.showMessageDialog(null, "<html>Please Wait 5 -" +
+                " 10 Seconds:<br>Loading Entry " +
+                "Information</html>", "Loading", 
+                JOptionPane.INFORMATION_MESSAGE,loadingAn);
+        }    
+    }
+
+}
